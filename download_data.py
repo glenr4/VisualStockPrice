@@ -3,7 +3,7 @@ import os
 
 # Variables
 stockSymbol = "GC=F"    # Gold futures
-startDate = '2024-01-01'
+startDate = '2015-01-01'
 endDate = '2024-12-31'
 interval = '1d'
 

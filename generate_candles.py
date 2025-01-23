@@ -7,12 +7,12 @@ import pandas as pd
 
 # Variables
 stockSymbol = "GC=F"    # Gold futures
-startDate = '2024-01-01'
+startDate = '2015-01-01'
 endDate = '2024-12-31'
 interval = '1d'
 large_move_max_candles=5
 large_move_threshold_percent=4
-pre_large_move_candles=30
+pre_large_move_candles=50
 
 # Create sub-folders
 if not os.path.exists("data"):
@@ -74,5 +74,5 @@ large_moves = find_large_price_moves(df,
 chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
 
 for start_date, end_date, window_df in large_moves:
-  filename = f"./images/large_move_{start_date.date()}_{end_date.date()}.png"
+  filename = f"./images/large_move_{start_date.date()}_{end_date.date()}_{pre_large_move_candles}.png"
   mpf.plot(window_df, type='candle', style=chart_style, axisoff=True,  volume=False, savefig=filename)
