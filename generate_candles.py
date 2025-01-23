@@ -10,6 +10,9 @@ stockSymbol = "GC=F"    # Gold futures
 startDate = '2024-01-01'
 endDate = '2024-12-31'
 interval = '1d'
+large_move_max_candles=5
+large_move_threshold_percent=4
+pre_large_move_candles=30
 
 # Create sub-folders
 if not os.path.exists("data"):
@@ -17,10 +20,11 @@ if not os.path.exists("data"):
 if not os.path.exists("images"):
     os.mkdir("images")
 
-def find_large_price_moves(tickerDf, window=5, threshold=0.05, pre_move_window=30):
+def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_window=30):
   """
   Finds price moves within the given DataFrame that are greater than the specified threshold 
-  over the given window size and captures the preceding 'pre_move_window' candles.
+  over the given window size and captures the preceding 'pre_move_window' candles. 
+  Moves beyond the end of a detected large move before searching for the next one.
 
   Args:
     tickerDf: DataFrame containing stock data with 'Open', 'High', 'Low', 'Close' columns.
@@ -37,18 +41,23 @@ def find_large_price_moves(tickerDf, window=5, threshold=0.05, pre_move_window=3
   """
 
   large_moves = []
-  for i in range(pre_move_window, len(tickerDf) - window + 1):
+  i = pre_move_window  # Start from pre_move_window
+
+  while i < len(tickerDf) - window:
     start_date_pre_move = tickerDf.index[i - pre_move_window]
     start_date_move = tickerDf.index[i]
     end_date_move = tickerDf.index[i + window - 1]
 
     start_price = tickerDf['Close'][i]
     end_price = tickerDf['Close'][i + window - 1]
-    pct_change = (end_price - start_price) / start_price
+    pct_change = (end_price - start_price) / start_price * 100
 
-    if abs(pct_change) > threshold:
+    if abs(pct_change) > threshold_percent:
       combined_window_df = tickerDf[start_date_pre_move:end_date_move]
       large_moves.append((start_date_move, end_date_move, combined_window_df))
+      i += window  # Move beyond the end of the large move
+    else:
+      i += 1
 
   return large_moves
 
@@ -56,7 +65,10 @@ def find_large_price_moves(tickerDf, window=5, threshold=0.05, pre_move_window=3
 source_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
 df = pd.read_csv(source_file, index_col=0, parse_dates=True)
 
-large_moves = find_large_price_moves(df, window=5, threshold=0.04)
+large_moves = find_large_price_moves(df, 
+                                     window=large_move_max_candles, 
+                                     threshold_percent=large_move_threshold_percent, 
+                                     pre_move_window=pre_large_move_candles)
 
 # Create the candlestick chart using mplfinance
 chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
