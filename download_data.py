@@ -11,7 +11,7 @@ if not os.path.exists("data"):
     os.mkdir("data")
 
 # Download price data 
-stock_data = yf.download(stockSymbol, start='2024-01-01', end='2024-12-31')
+stock_data = yf.download(stockSymbol, start='2024-01-01', end='2024-12-31', multi_level_index=False)
 
 # Save the data to a CSV file
 stock_data.to_csv('./data/{}_{}_{}.csv'.format(stockSymbol, startDate, endDate))
