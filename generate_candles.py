@@ -5,8 +5,11 @@ import mplfinance as mpf
 import os
 import pandas as pd
 
-# variables
-source_file = "./data/GC=F_2024-01-01_2024-12-31.csv"
+# Variables
+stockSymbol = "GC=F"    # Gold futures
+startDate = '2024-01-01'
+endDate = '2024-12-31'
+interval = '1d'
 
 # Create sub-folders
 if not os.path.exists("data"):
@@ -15,6 +18,7 @@ if not os.path.exists("images"):
     os.mkdir("images")
 
 # Load the stock data from the saved CSV file
+source_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
 df = pd.read_csv(source_file, index_col=0, parse_dates=True)
 
 # Create the candlestick chart using mplfinance
