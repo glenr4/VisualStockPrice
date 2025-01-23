@@ -2,7 +2,7 @@ import yfinance as yf
 import os
 
 # Variables
-stockSymbol = "GC=F"    # Gold futures
+stockSymbol = "^AORD" # Australian All Ordinaries Index
 startDate = '2015-01-01'
 endDate = '2024-12-31'
 interval = '1d'
