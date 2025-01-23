@@ -74,5 +74,5 @@ large_moves = find_large_price_moves(df,
 chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
 
 for start_date, end_date, window_df in large_moves:
-  filename = f"./images/large_move_{start_date.date()}_{end_date.date()}_{pre_large_move_candles}.png"
+  filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{pre_large_move_candles}.png"
   mpf.plot(window_df, type='candle', style=chart_style, axisoff=True,  volume=False, savefig=filename)
