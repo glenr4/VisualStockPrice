@@ -5,7 +5,7 @@ from PIL import Image
 import torch.nn.functional as F
 
 # Image to categorise
-image_path='images/test/up/^AORD_2016-02-12_2016-02-18__pre50_post5_pct4_up.png'
+image_path='images/test/up/^AORD_2022-09-30_2022-10-06__pre50_post5_pct4_up.png'
 
 ###########################
 # Load the saved model
@@ -20,27 +20,13 @@ model.to(device)
 # Load and preprocess the image
 image = Image.open(image_path).convert('RGB')   # Limit to 3 channels to match model
 
-print(image.size)  # Print original size
+transform = transforms.Compose([
+    transforms.Resize((64, 64)),  # Match the size used during training
+    transforms.ToTensor(),
+    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+])
 
-transform1 = transforms.Resize((64, 64))
-image = transform1(image)
-print(image.size)  # Print size after resize
-
-transform2 = transforms.ToTensor()
-image = transform2(image)
-print(image.shape)  # Print shape after ToTensor
-
-transform3 = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-image = transform3(image)
-print(image.shape)  # Print shape after Normalize
-
-# transform = transforms.Compose([
-#     transforms.Resize((64, 64)),  # Match the size used during training
-#     transforms.ToTensor(),
-#     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-# ])
-
-# image = transform(image)
+image = transform(image)
 image = image.unsqueeze(0)  # Add a batch dimension
 image = image.to(device)  # Move the image to the device
 

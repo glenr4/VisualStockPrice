@@ -1,4 +1,4 @@
-import StockClassifier
+from StockClassifier import StockClassifier
 import torch
 import torch.nn as nn
 import torch.optim as optim
