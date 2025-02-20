@@ -9,7 +9,7 @@ train_images_dir = "images/train"
 test_images_dir = "images/test"
 
 # 1. Define the Model (CNN) with dynamic flattening
-
+# Moved to StockClassifier.py
 
 # 2. Load and Preprocess Data
 transform = transforms.Compose([
@@ -61,4 +61,4 @@ for epoch in range(num_epochs):
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Accuracy: {accuracy:.2f}%')
 
 # 6. Save the Model
-torch.save(model.state_dict(), 'stock_classifier.pth')
+torch.save(model.state_dict(), 'model/stock_classifier.pth')

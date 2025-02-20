@@ -10,7 +10,7 @@ image_path='images/test/up/^AORD_2016-02-12_2016-02-18__pre50_post5_pct4_up.png'
 ###########################
 # Load the saved model
 model = StockClassifier()  # Make sure this is the same architecture you used for training
-model.load_state_dict(torch.load('stock_classifier.pth'))
+model.load_state_dict(torch.load('model/stock_classifier.pth'))
 model.eval()  # Set the model to evaluation mode
 
 # Define the device (GPU if available)
