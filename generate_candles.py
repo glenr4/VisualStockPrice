@@ -15,10 +15,9 @@ large_move_threshold_percent=4
 pre_large_move_candles=50
 
 # Create sub-folders
-if not os.path.exists("data"):
-    os.mkdir("data")
-if not os.path.exists("images"):
-    os.mkdir("images")
+for folder in ["data", "images", "images/up", "images/down", "images/neutral"]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
 def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_window=30):
   """
@@ -41,23 +40,36 @@ def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_win
   """
 
   large_moves = []
-  i = pre_move_window  # Start from pre_move_window
+  i = pre_move_window
+  last_neutral_idx = -pre_move_window  # Track the last neutral image position
 
   while i < len(tickerDf) - window:
-    start_date_pre_move = tickerDf.index[i - pre_move_window]
-    start_date_move = tickerDf.index[i]
-    end_date_move = tickerDf.index[i + window - 1]
+      start_date_pre_move = tickerDf.index[i - pre_move_window]
+      start_date_move = tickerDf.index[i]
+      end_date_move = tickerDf.index[i + window - 1]
 
-    start_price = tickerDf['Close'][i]
-    end_price = tickerDf['Close'][i + window - 1]
-    pct_change = (end_price - start_price) / start_price * 100
+      start_price = tickerDf['Close'][i]
+      end_price = tickerDf['Close'][i + window - 1]
+      pct_change = (end_price - start_price) / start_price * 100
 
-    if abs(pct_change) > threshold_percent:
-      combined_window_df = tickerDf[start_date_pre_move:end_date_move]
-      large_moves.append((start_date_move, end_date_move, combined_window_df))
-      i += window  # Move beyond the end of the large move
-    else:
-      i += 1
+      # Always capture the window for up/down moves
+      pre_move_df = tickerDf[start_date_pre_move:start_date_move]
+      
+      # Capture the full move
+      complete_window_df = tickerDf[start_date_pre_move:end_date_move]
+
+      # For neutral moves, only capture if sufficiently spaced from last neutral
+      if abs(pct_change) <= threshold_percent:
+          if i - last_neutral_idx >= pre_move_window:
+              large_moves.append((start_date_move, end_date_move, pre_move_df, pct_change, complete_window_df))
+              last_neutral_idx = i
+          i += 1
+      else:
+          large_moves.append((start_date_move, end_date_move, pre_move_df, pct_change, complete_window_df))
+          if abs(pct_change) > threshold_percent:
+              i += window  # Move beyond the end of the large move
+          else:
+              i += 1
 
   return large_moves
 
@@ -73,6 +85,26 @@ large_moves = find_large_price_moves(df,
 # Create the candlestick chart using mplfinance
 chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
 
-for start_date, end_date, window_df in large_moves:
-  filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{pre_large_move_candles}.png"
-  mpf.plot(window_df, type='candle', style=chart_style, axisoff=True,  volume=False, savefig=filename)
+for start_date, end_date, window_df, pct_change, combined_window_df in large_moves:
+  # Determine the directory based on the price movement
+  if abs(pct_change) <= large_move_threshold_percent:
+      direction = "neutral"
+  elif pct_change > large_move_threshold_percent:
+      direction = "up"
+  else:
+      direction = "down"
+
+  # Image showing pre and post move
+  filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
+  mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
+  
+  # Create filename with the percentage change included
+  filename = f"./images/{direction}/{stockSymbol}_{start_date.date()}_{end_date.date()}__pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
+  
+  # Plot only the pre-move candles
+  mpf.plot(window_df, 
+            type='candle', 
+            style=chart_style, 
+            axisoff=True, 
+            volume=False, 
+            savefig=filename)
