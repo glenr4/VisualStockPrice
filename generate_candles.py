@@ -5,15 +5,27 @@ import mplfinance as mpf
 import os
 import pandas as pd
 import var
+import file_handling as fh
+
+# TODO: for timeframes in minutes, include hours and minutes in the filename so that they don't get overwritten multiple times
+# end_date.date()
+
+
 
 # Variables
-stockSymbol = var.stockSymbol
-startDate = var.startDate
-endDate = var.endDate
-interval = var.interval
+# stockSymbol = var.stockSymbol
+# startDate = var.startDate
+# endDate = var.endDate
+# interval = var.interval
+
+# TODO need to automatically pick symbol and interval from the file name
+stockSymbol = "MGC"
+interval = '1m'
 large_move_max_candles = var.large_move_max_candles
 large_move_threshold_percent = var.large_move_threshold_percent
 pre_large_move_candles = var.pre_large_move_candles
+
+source_file = fh.browse_file('data')
 
 # Create sub-folders
 for folder in ["data", "images", "images/up", "images/down", "images/neutral"]:
@@ -75,9 +87,10 @@ def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_win
   return large_moves
 
 # Load the stock data from the saved CSV file
-source_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
+# source_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
 df = pd.read_csv(source_file, index_col=0, parse_dates=True)
-
+print(df.head())
+# print(df.index[0])
 large_moves = find_large_price_moves(df, 
                                      window=large_move_max_candles, 
                                      threshold_percent=large_move_threshold_percent, 
