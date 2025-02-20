@@ -18,7 +18,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 # Load and preprocess the image
-image = Image.open(image_path).convert('RGB')
+image = Image.open(image_path).convert('RGB')   # Limit to 3 channels to match model
 
 print(image.size)  # Print original size
 
