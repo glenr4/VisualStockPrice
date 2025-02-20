@@ -4,15 +4,16 @@ import yfinance as yf
 import mplfinance as mpf
 import os
 import pandas as pd
+import var
 
 # Variables
-stockSymbol = "^AORD" 
-startDate = '2015-01-01'
-endDate = '2024-12-31'
-interval = '1d'
-large_move_max_candles=5
-large_move_threshold_percent=4
-pre_large_move_candles=50
+stockSymbol = var.stockSymbol
+startDate = var.startDate
+endDate = var.endDate
+interval = var.interval
+large_move_max_candles = var.large_move_max_candles
+large_move_threshold_percent = var.large_move_threshold_percent
+pre_large_move_candles = var.pre_large_move_candles
 
 # Create sub-folders
 for folder in ["data", "images", "images/up", "images/down", "images/neutral"]:

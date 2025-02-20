@@ -1,11 +1,12 @@
 import yfinance as yf
 import os
+import var
 
 # Variables
-stockSymbol = "^AORD" # Australian All Ordinaries Index
-startDate = '2015-01-01'
-endDate = '2024-12-31'
-interval = '1d'
+stockSymbol = var.stockSymbol
+startDate = var.startDate
+endDate = var.endDate
+interval = var.interval
 
 # Create sub-folders
 if not os.path.exists("data"):

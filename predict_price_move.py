@@ -3,9 +3,11 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import torch.nn.functional as F
+import var
+import file_handling as fh
 
 # Image to categorise
-image_path='images/test/up/^AORD_2022-09-30_2022-10-06__pre50_post5_pct4_up.png'
+image_path = fh.browse_file('images')
 
 ###########################
 # Load the saved model

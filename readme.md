@@ -4,7 +4,7 @@
 
 1. Install Python v3.13 or higher
 1. Install Anaconda
-1. Restore packages and create an new environment:
+1. Restore packages and create a new environment:
 
 ```sh
 conda env create -n VisualStockPrice --file environment.yml
@@ -12,16 +12,20 @@ conda env create -n VisualStockPrice --file environment.yml
 
 ## Run It
 
-### Parameters
+### Input Parameters
 
-To do
+Set in the `var.py` file.
 
-### From a CLI run:
+### From a CLI:
 
 ```sh
 python download_data.py
-python generated_candles.py
+python generate_candles.py
 python split_images.py
 python train_model.py
 python predict_price_move.py
 ```
+
+# To do
+
+- Create classes instead of stand alone files
