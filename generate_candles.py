@@ -7,10 +7,12 @@ import pandas as pd
 import var
 import file_handling as fh
 
+# TODO need to automatically pick symbol and interval from the file name
+stockSymbol = "GC"
+interval = '1d'
+
 # TODO: for timeframes in minutes, include hours and minutes in the filename so that they don't get overwritten multiple times
 # end_date.date()
-
-
 
 # Variables
 # stockSymbol = var.stockSymbol
@@ -18,9 +20,6 @@ import file_handling as fh
 # endDate = var.endDate
 # interval = var.interval
 
-# TODO need to automatically pick symbol and interval from the file name
-stockSymbol = "MGC"
-interval = '1m'
 large_move_max_candles = var.large_move_max_candles
 large_move_threshold_percent = var.large_move_threshold_percent
 pre_large_move_candles = var.pre_large_move_candles
@@ -109,7 +108,7 @@ for start_date, end_date, window_df, pct_change, combined_window_df in large_mov
       direction = "down"
 
   # Image showing pre and post move
-  filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
+  filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}_full_move.png"
   mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
   
   # Create filename with the percentage change included
