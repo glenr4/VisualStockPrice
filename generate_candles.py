@@ -64,11 +64,9 @@ def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_win
               last_neutral_idx = i
           i += 1
       else:
+        #   print(f"Large move detected: {pct_change:.2f}% from {start_date_move.date()} to {end_date_move.date()}")
           large_moves.append((start_date_move, end_date_move, pre_move_df, pct_change, complete_window_df))
-          if abs(pct_change) > threshold_percent:
-              i += window  # Move beyond the end of the large move
-          else:
-              i += 1
+          i += window  # Move beyond the end of the large move
 
   return large_moves
 
@@ -94,7 +92,7 @@ for input_file in os.listdir(input_dir):
     # Load the stock data from the saved CSV file
     # input_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
     df = pd.read_csv(input_path, index_col=0, parse_dates=True)
-    print(df.head())
+    # print(df.head())
     # print(df.index[0])
     large_moves = find_large_price_moves(df, 
                                         window=large_move_max_candles, 
@@ -113,17 +111,20 @@ for input_file in os.listdir(input_dir):
         else:
             direction = "down"
 
-    # Image showing pre and post move
-    filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}_full_move.png"
-    mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
-    
-    # Create filename with the percentage change included
-    filename = f"./images/{direction}/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
-    
-    # Plot only the pre-move candles
-    mpf.plot(window_df, 
-                type='candle', 
-                style=chart_style, 
-                axisoff=True, 
-                volume=False, 
-                savefig=filename)
+        print(f"Large move detected: {pct_change:.2f}% from {start_date.date()} to {end_date.date()}")
+
+
+        # Image showing pre and post move
+        filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}_full_move.png"
+        mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
+        
+        # Create filename with the percentage change included
+        filename = f"./images/{direction}/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
+        
+        # Plot only the pre-move candles
+        mpf.plot(window_df, 
+                    type='candle', 
+                    style=chart_style, 
+                    axisoff=True, 
+                    volume=False, 
+                    savefig=filename)
