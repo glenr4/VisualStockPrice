@@ -18,13 +18,6 @@ large_move_max_candles = var.large_move_max_candles
 large_move_threshold_percent = var.large_move_threshold_percent
 pre_large_move_candles = var.pre_large_move_candles
 
-source_file = fh.browse_file('data')
-
-# Create sub-folders
-for folder in ["data", "images", "images/up", "images/down", "images/neutral"]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
 def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_window=30):
   """
   Finds price moves within the given DataFrame that are greater than the specified threshold 
@@ -79,39 +72,58 @@ def find_large_price_moves(tickerDf, window=5, threshold_percent=4, pre_move_win
 
   return large_moves
 
-# Load the stock data from the saved CSV file
-# source_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
-df = pd.read_csv(source_file, index_col=0, parse_dates=True)
-print(df.head())
-# print(df.index[0])
-large_moves = find_large_price_moves(df, 
-                                     window=large_move_max_candles, 
-                                     threshold_percent=large_move_threshold_percent, 
-                                     pre_move_window=pre_large_move_candles)
+# source_file = fh.browse_file('data')
+input_dir = os.path.join(os.path.dirname(__file__), 'data')
 
-# Create the candlestick chart using mplfinance
-chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
 
-for start_date, end_date, window_df, pct_change, combined_window_df in large_moves:
-  # Determine the directory based on the price movement
-  if abs(pct_change) <= large_move_threshold_percent:
-      direction = "neutral"
-  elif pct_change > large_move_threshold_percent:
-      direction = "up"
-  else:
-      direction = "down"
+for input_file in os.listdir(input_dir):
+    if not input_file.endswith('.csv'):
+        continue
+        
+    # source_file = os.path.join(input_dir, input_file)
+    input_path = os.path.join(input_dir, input_file)
 
-  # Image showing pre and post move
-  filename = f"./images/{var.stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}_full_move.png"
-  mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
-  
-  # Create filename with the percentage change included
-  filename = f"./images/{direction}/{var.stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
-  
-  # Plot only the pre-move candles
-  mpf.plot(window_df, 
-            type='candle', 
-            style=chart_style, 
-            axisoff=True, 
-            volume=False, 
-            savefig=filename)
+    stockSymbol = os.path.basename(input_file).split(' ')[0]
+
+    # Create sub-folders
+    for folder in ["data", "images", "images/up", "images/down", "images/neutral"]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+
+    # Load the stock data from the saved CSV file
+    # input_file = './data/{}_{}_{}_{}.csv'.format(stockSymbol, startDate, endDate, interval)
+    df = pd.read_csv(input_path, index_col=0, parse_dates=True)
+    print(df.head())
+    # print(df.index[0])
+    large_moves = find_large_price_moves(df, 
+                                        window=large_move_max_candles, 
+                                        threshold_percent=large_move_threshold_percent, 
+                                        pre_move_window=pre_large_move_candles)
+
+    # Create the candlestick chart using mplfinance
+    chart_style = mpf.make_mpf_style(base_mpf_style='classic', gridstyle='')
+
+    for start_date, end_date, window_df, pct_change, combined_window_df in large_moves:
+    # Determine the directory based on the price movement
+        if abs(pct_change) <= large_move_threshold_percent:
+            direction = "neutral"
+        elif pct_change > large_move_threshold_percent:
+            direction = "up"
+        else:
+            direction = "down"
+
+    # Image showing pre and post move
+    filename = f"./images/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}_full_move.png"
+    mpf.plot(combined_window_df, type='candle', style=chart_style, axisoff=True, volume=False, savefig=filename)
+    
+    # Create filename with the percentage change included
+    filename = f"./images/{direction}/{stockSymbol}_{start_date.date()}_{end_date.date()}_{var.interval}_pre{pre_large_move_candles}_post{large_move_max_candles}_pct{large_move_threshold_percent}_{direction}.png"
+    
+    # Plot only the pre-move candles
+    mpf.plot(window_df, 
+                type='candle', 
+                style=chart_style, 
+                axisoff=True, 
+                volume=False, 
+                savefig=filename)
